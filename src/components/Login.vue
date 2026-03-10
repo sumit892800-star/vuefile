@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { useRouter } from "vue-router"
 import { ref } from "vue"
 import { useAuthStore } from "../store/store"
@@ -18,12 +18,6 @@ async function login() {
 
   try {
 
-    // Example API call (future)
-    // const res = await axios.post("/api/login", { email, password })
-
-    // If API exists
-    // const token = res.data.token
-    // const apiRole = res.data.role
 
     // CURRENT DEMO MODE
     const token = "12345"
@@ -36,6 +30,37 @@ async function login() {
   } catch (err) {
     console.log("Login failed", err)
   }
+
+}
+</script> -->
+
+<script setup>
+import { useRouter } from "vue-router"
+import { ref } from "vue"
+import { useAuthStore } from "../store/store"
+import { rolePermissions } from "../config/permission"
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const role = ref("user")
+
+const roleRedirect = {
+  admin: "/dashboard",
+  manager: "/dashboard",
+  user: "/home"
+}
+
+async function login() {
+
+  const token = "12345"
+  const apiRole = role.value
+
+  // get dummy permissions
+  const permissions = rolePermissions[apiRole]
+  authStore.login(token, apiRole, permissions)
+
+  router.push(roleRedirect[apiRole])
 
 }
 </script>

@@ -4,6 +4,7 @@ import Login from "../components/Login.vue"
 import Dashboard from "../components/Dashboard.vue"
 import MainLayout from "../layouts/MainLayout.vue"
 import Home from "../components/Home.vue"
+import VideoDownloader from "../components/VideoDownloader.vue"
 
 
 const routes = [
@@ -25,7 +26,16 @@ const routes = [
         }
       },
       {
-        path: "about",
+        path: "/downloader",
+        name: "downloader",
+        component: VideoDownloader,
+        meta: {
+          roles: ["admin", "manager", "user"],
+          title: "Video Downloader"
+        }
+      },
+      {
+        path: "about", 
         component: About,
         meta: {
           roles: ["admin"],

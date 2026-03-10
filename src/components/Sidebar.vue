@@ -1,25 +1,16 @@
 <script setup>
 import { computed } from "vue"
-import { useRouter } from "vue-router"
+import { menuItems } from "../config/menu"
 import { useAuthStore } from "../store/store"
 import { useUIStore } from "../store/uiStore"
 
-const router = useRouter()
 const auth = useAuthStore()
 const ui = useUIStore()
 
 const filteredMenu = computed(() => {
-
-  const mainRoute = router.getRoutes().find(r => r.path === "/")
-
-  return mainRoute.children.filter(route => {
-
-    if (!route.meta.roles) return true
-
-    return route.meta.roles.includes(auth.role)
-
-  })
-
+  return menuItems.filter(item =>
+    auth.permissions.includes(item.permission)
+  )
 })
 </script>
 
@@ -32,10 +23,10 @@ const filteredMenu = computed(() => {
     <router-link
       v-for="item in filteredMenu"
       :key="item.path"
-      :to="'/' + item.path"
+      :to="item.path"
       class="menu-link"
     >
-      {{ item.meta.title }}
+      {{ item.name }}
     </router-link>
 
   </div>
