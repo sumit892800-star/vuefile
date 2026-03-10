@@ -6,14 +6,37 @@ import { useAuthStore } from "../store/store"
 const router = useRouter()
 const authStore = useAuthStore()
 
-const role = ref("user") // default role
+const role = ref("user")
 
-function login() {
-  // localStorage.setItem("token", "12345")
-  // localStorage.setItem("role", role.value)
-  authStore.login(role.value) //PINIA STORE USECASE+++++++++
+const roleRedirect = {
+  admin: "/dashboard",
+  manager: "/dashboard",
+  user: "/home"
+}
 
-  router.push("/dashboard")
+async function login() {
+
+  try {
+
+    // Example API call (future)
+    // const res = await axios.post("/api/login", { email, password })
+
+    // If API exists
+    // const token = res.data.token
+    // const apiRole = res.data.role
+
+    // CURRENT DEMO MODE
+    const token = "12345"
+    const apiRole = role.value
+
+    authStore.login(token, apiRole)
+
+    router.push(roleRedirect[apiRole])
+
+  } catch (err) {
+    console.log("Login failed", err)
+  }
+
 }
 </script>
 

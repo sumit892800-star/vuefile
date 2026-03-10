@@ -1,20 +1,30 @@
 <script setup>
 import { computed } from "vue"
-import { menuItems } from "../config/menu"
+import { useRouter } from "vue-router"
 import { useAuthStore } from "../store/store"
 import { useUIStore } from "../store/uiStore"
 
+const router = useRouter()
 const auth = useAuthStore()
 const ui = useUIStore()
 
 const filteredMenu = computed(() => {
-  return menuItems.filter(item =>
-    item.roles.includes(auth.role)
-  )
+
+  const mainRoute = router.getRoutes().find(r => r.path === "/")
+
+  return mainRoute.children.filter(route => {
+
+    if (!route.meta.roles) return true
+
+    return route.meta.roles.includes(auth.role)
+
+  })
+
 })
 </script>
 
 <template>
+
   <div v-if="ui.sidebarOpen" class="sidebar">
 
     <h3>Sidebar</h3>
@@ -22,13 +32,14 @@ const filteredMenu = computed(() => {
     <router-link
       v-for="item in filteredMenu"
       :key="item.path"
-      :to="item.path"
+      :to="'/' + item.path"
       class="menu-link"
     >
-      {{ item.name }}
+      {{ item.meta.title }}
     </router-link>
 
   </div>
+
 </template>
 
 <style>
