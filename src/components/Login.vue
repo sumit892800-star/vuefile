@@ -5,6 +5,7 @@ import { useAuthStore } from "../store/store"
 import { rolePermissions } from "../config/permission"
 import { loginUser, registerUser, loginWithGoogle } from "../services/auth"
 import { signInWithGoogle, isFirebaseConfigured } from "../services/firebase"
+import { decodeJwt } from "../utils/jwt"
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -60,9 +61,18 @@ const handleLogin = async () => {
 
     const data = res?.data || {}
     const accessToken = data.accessToken || data.token
-    const refreshToken = data.refreshToken || data.refresh || "refresh_demo"
-    const apiRole = data.role || role.value
+    const refreshToken = data.refreshToken || data.refresh || "refresh_demo";
+
+    const decoded = decodeJwt(accessToken)
+    const tokenRole =
+      decoded?.role ||
+      decoded?.user?.role ||
+      (Array.isArray(decoded?.roles) ? decoded.roles[0] : null)
+    const normalizedRole = tokenRole ? String(tokenRole).toLowerCase() : null
+    const apiRole = data.role || normalizedRole || role.value
     const permissions = data.permissions || rolePermissions[apiRole] || []
+
+    console.log("Login response:", decoded) // Debug log
 
     if (!accessToken) {
       throw new Error("Missing access token")
@@ -91,7 +101,13 @@ const handleRegister = async () => {
     const data = res?.data || {}
     const accessToken = data.accessToken || data.token
     const refreshToken = data.refreshToken || data.refresh || "refresh_demo"
-    const apiRole = data.role || "user"
+    const decoded = decodeJwt(accessToken)
+    const tokenRole =
+      decoded?.role ||
+      decoded?.user?.role ||
+      (Array.isArray(decoded?.roles) ? decoded.roles[0] : null)
+    const normalizedRole = tokenRole ? String(tokenRole).toLowerCase() : null
+    const apiRole = data.role || normalizedRole || "user"
     const permissions = data.permissions || rolePermissions[apiRole] || []
 
     if (!accessToken) {
