@@ -1,21 +1,14 @@
 <script setup>
-import { useRouter } from "vue-router"
+import { computed } from "vue"
+import { useAuthStore } from "../store/store"
 
-const router = useRouter()
-
-function logout() {
-  localStorage.removeItem("token")
-  router.push("/login")
-}
+const auth = useAuthStore()
+const roleLabel = computed(() => auth.role || "user")
 </script>
 
 <template>
   <div>
-    <h1>Dashboard Page</h1>
-    <p>You are logged in.</p>
-
-    <button @click="logout">
-      Logout
-    </button>
+    <h1>Dashboard</h1>
+    <p>Welcome back. Your role is {{ roleLabel }}.</p>
   </div>
 </template>

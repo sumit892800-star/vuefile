@@ -1,10 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router"
-import About from "../components/About.vue"
 import Login from "../components/Login.vue"
 import Dashboard from "../components/Dashboard.vue"
 import MainLayout from "../layouts/MainLayout.vue"
-import Home from "../components/Home.vue"
-import VideoDownloader from "../components/VideoDownloader.vue"
+import Users from "../components/Users.vue"
 
 
 const routes = [
@@ -18,36 +16,25 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       {
+        path: "",
+        redirect: "/dashboard"
+      },
+      {
         path: "dashboard",
         component: Dashboard,
         meta: {
-          roles: ["admin", "manager"],
+          roles: ["admin", "manager", "user"],
+          permission: "dashboard:view",
           title: "Dashboard"
         }
       },
       {
-        path: "/downloader",
-        name: "downloader",
-        component: VideoDownloader,
+        path: "users",
+        component: Users,
         meta: {
           roles: ["admin", "manager", "user"],
-          title: "Video Downloader"
-        }
-      },
-      {
-        path: "about", 
-        component: About,
-        meta: {
-          roles: ["admin"],
-          title: "About"
-        }
-      },
-      {
-        path: "home",
-        component: Home,
-        meta: {
-          roles: ["user"],
-          title: "Home"
+          permission: "users:view",
+          title: "Users"
         }
       }
 
@@ -61,18 +48,57 @@ const router = createRouter({
   routes
 })
 
+const defaultRouteByRole = {
+  admin: "/dashboard",
+  manager: "/dashboard",
+  user: "/users"
+}
+
+const safeParsePermissions = () => {
+  try {
+    const raw = localStorage.getItem("permissions") || "[]"
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+const getFirstAllowedRoute = (permissions) => {
+  if (!Array.isArray(permissions)) return "/login"
+  if (permissions.includes("dashboard:view")) return "/dashboard"
+  if (permissions.includes("users:view")) return "/users"
+  return "/login"
+}
+
 /* PROTECTED ROUTE GUARD */
 router.beforeEach((to, from, next) => {
 
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("access_token")
   const role = localStorage.getItem("role")
+  const permissions = safeParsePermissions()
 
-  if (to.meta.requiresAuth && !token) {
+  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+  const requiredRole = to.matched.find(r => r.meta.roles)?.meta.roles
+  const requiredPermission = to.matched.find(r => r.meta.permission)?.meta.permission
+
+  if (requiresAuth && !token) {
     return next("/login")
   }
 
-  if (to.meta.roles && !to.meta.roles.includes(role)) {
-    return next("/dashboard")
+  if (to.path === "/login" && token) {
+    const fallback = defaultRouteByRole[role] || getFirstAllowedRoute(permissions)
+    return next(fallback)
+  }
+
+  if (requiredRole && !requiredRole.includes(role)) {
+    const fallback = defaultRouteByRole[role] || getFirstAllowedRoute(permissions)
+    return next(fallback)
+  }
+
+  if (requiredPermission && !permissions.includes(requiredPermission)) {
+    const fallback = getFirstAllowedRoute(permissions)
+    return next(fallback)
   }
 
   next()

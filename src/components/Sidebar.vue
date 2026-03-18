@@ -8,9 +8,8 @@ const auth = useAuthStore()
 const ui = useUIStore()
 
 const filteredMenu = computed(() => {
-  return menuItems.filter(item =>
-    auth.permissions.includes(item.permission)
-  )
+  const permissions = auth.permissions || []
+  return menuItems.filter(item => permissions.includes(item.permission))
 })
 </script>
 
@@ -18,7 +17,7 @@ const filteredMenu = computed(() => {
 
   <div v-if="ui.sidebarOpen" class="sidebar">
 
-    <h3>Sidebar</h3>
+    <div class="brand">SecureApp</div>
 
     <router-link
       v-for="item in filteredMenu"
@@ -36,16 +35,28 @@ const filteredMenu = computed(() => {
 <style>
 .sidebar{
   width:220px;
-  background:#2c3e50;
+  background:#0f172a;
   color:white;
-  padding:20px;
+  padding:18px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
 
+.brand{
+  font-weight:700;
+  letter-spacing:0.5px;
+  margin-bottom:8px;
+}
+
 .menu-link{
   color:white;
   text-decoration:none;
+  padding:8px 10px;
+  border-radius:8px;
+}
+
+.menu-link.router-link-active{
+  background:#1f2937;
 }
 </style>

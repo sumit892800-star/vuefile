@@ -2,34 +2,48 @@ import { defineStore } from "pinia"
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: null,
+    accessToken: null,
+    refreshToken: null,
     role: null,
     permissions: []
   }),
 
   actions: {
-    login(token, role, permissions) {
-      this.token = token
+    login(accessToken, refreshToken, role, permissions) {
+      this.accessToken = accessToken
+      this.refreshToken = refreshToken
       this.role = role
-      this.permissions = permissions
+      this.permissions = Array.isArray(permissions) ? permissions : []
 
-      localStorage.setItem("token", token)
+      localStorage.setItem("access_token", accessToken)
+      localStorage.setItem("refresh_token", refreshToken)
       localStorage.setItem("role", role)
       localStorage.setItem("permissions", JSON.stringify(permissions))
     },
 
     loadFromStorage() {
-      this.token = localStorage.getItem("token")
+      this.accessToken = localStorage.getItem("access_token")
+      this.refreshToken = localStorage.getItem("refresh_token")
       this.role = localStorage.getItem("role")
-      this.permissions = JSON.parse(localStorage.getItem("permissions") || "[]")
+      try {
+        const raw = localStorage.getItem("permissions") || "[]"
+        const parsed = JSON.parse(raw)
+        this.permissions = Array.isArray(parsed) ? parsed : []
+      } catch {
+        this.permissions = []
+      }
     },
 
     logout() {
-      this.token = null
+      this.accessToken = null
+      this.refreshToken = null
       this.role = null
       this.permissions = []
 
-      localStorage.clear()
+      localStorage.removeItem("access_token")
+      localStorage.removeItem("refresh_token")
+      localStorage.removeItem("role")
+      localStorage.removeItem("permissions")
     }
   }
 })
