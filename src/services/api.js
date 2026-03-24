@@ -4,11 +4,13 @@ import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./token
 const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
 
 const api = axios.create({
-  baseURL
+  baseURL,
+  withCredentials: true
 })
 
 const refreshClient = axios.create({
-  baseURL
+  baseURL,
+  withCredentials: true
 })
 
 api.interceptors.request.use((config) => {
@@ -29,19 +31,18 @@ const extractTokens = (data) => {
 }
 
 export const refreshAccessToken = async () => {
-  const refreshToken = getRefreshToken()
-  if (!refreshToken) {
-    throw new Error("Missing refresh token")
-  }
+  const res = await refreshClient.post(
+    "/api/auth/refresh", {},
+    { withCredentials: true }
+  )
 
-  const res = await refreshClient.post("/api/auth/refresh", { refreshToken })
-  const { accessToken, refreshToken: newRefresh } = extractTokens(res.data)
+  const accessToken = res.data?.accessToken
 
   if (!accessToken) {
     throw new Error("Refresh failed")
   }
 
-  setTokens(accessToken, newRefresh || refreshToken)
+  setTokens(accessToken) // only access token
   return accessToken
 }
 

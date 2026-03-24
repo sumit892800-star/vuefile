@@ -5,12 +5,9 @@ export const getAccessToken = () => localStorage.getItem(ACCESS_KEY)
 
 export const getRefreshToken = () => localStorage.getItem(REFRESH_KEY)
 
-export const setTokens = (accessToken, refreshToken) => {
+export const setTokens = (accessToken) => {
   if (accessToken) {
     localStorage.setItem(ACCESS_KEY, accessToken)
-  }
-  if (refreshToken) {
-    localStorage.setItem(REFRESH_KEY, refreshToken)
   }
 }
 

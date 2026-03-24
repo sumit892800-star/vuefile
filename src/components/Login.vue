@@ -136,7 +136,7 @@ const handleGoogleLogin = async () => {
     const res = await loginWithGoogle({ idToken, email: googleEmail, name })
     const data = res?.data || {}
     const accessToken = data.accessToken || data.token
-    const refreshToken = data.refreshToken || data.refresh || "refresh_demo"
+    const refreshToken = data.refreshToken || data.refresh;
     const apiRole = data.role || "user"
     const permissions = data.permissions || rolePermissions[apiRole] || []
 
@@ -144,7 +144,7 @@ const handleGoogleLogin = async () => {
       throw new Error("Missing access token")
     }
 
-    authStore.login(accessToken, refreshToken, apiRole, permissions)
+    authStore.login(accessToken, null, apiRole, permissions) //null because we are not using refresh tokens in this demo
     router.push(roleRedirect[apiRole])
   } catch (err) {
     errorMessage.value = "Google login failed. Try again."

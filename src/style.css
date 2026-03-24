@@ -1,14 +1,35 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@config "../tailwind.config.cjs";
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@layer base {
+  :root {
+    --bg: 0 0% 100%;
+    --fg: 222 47% 11%;
+    --card: 0 0% 100%;
+    --border: 214 32% 91%;
+    --primary: 338 87% 55%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --radius: 12px;
+  }
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  .theme-dark {
+    --bg: 222 47% 11%;
+    --fg: 210 40% 98%;
+    --card: 222 47% 15%;
+    --border: 217 19% 27%;
+    --primary: 338 87% 60%;
+    --primary-foreground: 222 47% 11%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 215 20% 65%;
+  }
+
+  body {
+    background-color: hsl(var(--bg));
+    color: hsl(var(--fg));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  }
 }

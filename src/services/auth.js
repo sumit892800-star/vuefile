@@ -9,7 +9,7 @@ export const loginUser = (payload) => {
 }
 
 export const loginWithGoogle = (payload) => {
-  return api.post("/api/auth/login", { provider: "google", ...payload })
+  return api.post("/api/auth/google", { provider: "google", ...payload })
 }
 
 export const logoutUser = (payload = {}) => {
